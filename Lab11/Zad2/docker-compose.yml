@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  node:
+    image: node:current-alpine
+    volumes:
+      - ./app:/app
+    command:
+        - sh
+        - -c
+        - "cd /app && npm install && node index.js"
+    ports:
+      - "8080:3001"
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    volumes:
+      - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - ./grafana/dashboard.json:/var/lib/grafana/dashboards/dashboard.json
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
